@@ -1,6 +1,7 @@
 ﻿using eCommerce.API.IRepositories;
 using eCommerce.API.Models;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace eCommerce.API.Repositories
 {
@@ -20,22 +21,34 @@ namespace eCommerce.API.Repositories
        
         public Usuario GetById(int id)
         {
-            throw new System.NotImplementedException();
+            return _db.FirstOrDefault(a => a.Id == id);
         }
 
         public void Insert(Usuario usuario)
         {
-            throw new System.NotImplementedException();
+            var ultimoUsuario = _db.LastOrDefault();
+
+            if (ultimoUsuario == null)
+            {
+                usuario.Id = 1;
+            }
+            else
+            {
+                usuario.Id = ultimoUsuario.Id;
+                usuario.Id++;
+            }
+            _db.Add(usuario);
         }
 
         public void Update(Usuario usuario)
         {
-            throw new System.NotImplementedException();
+            _db.Remove(_db.FirstOrDefault(a => a.Id == usuario.Id));
+            _db.Add(usuario);
         }
 
         public void Delete(int id)
         {
-            throw new System.NotImplementedException();
+            _db.Remove(_db.FirstOrDefault(a => a.Id == id));
         }
     }
 }
