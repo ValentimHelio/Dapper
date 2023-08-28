@@ -1,54 +1,50 @@
-﻿using eCommerce.API.IRepositories;
+﻿using Dapper;
+using eCommerce.API.IRepositories;
 using eCommerce.API.Models;
+using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace eCommerce.API.Repositories
 {
     public class UsuarioRepository : IUsuarioRepository
     {
-        private static List<Usuario> _db = new List<Usuario>()
+        private IDbConnection _connection;
+        public UsuarioRepository() 
         {
-            new Usuario(){ Id=1, Nome="Filipe Rodrigues", Email="filipe.rodrigues@gmail.com" },
-            new Usuario(){ Id=2, Nome="Marcelo Rodrigues", Email="marcelo.rodrigues@gmail.com"},
-            new Usuario(){ Id=3, Nome="Jessica Rodrigues", Email="jessica.rodrigues@gmail.com"}
-        };
+            _connection = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Dapper;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+        }
 
+        //ADO.NET > Dapper: Micro-ORM (MER <-> POO)
         public List<Usuario> Get()
         {
-            return _db;
+            return _connection.Query<Usuario>("SELECT * FROM Usuarios").ToList();
         }
-       
-        public Usuario GetById(int id)
+
+        public Usuario Get(int id)
         {
-            return _db.FirstOrDefault(a => a.Id == id);
+            return _connection.QuerySingleOrDefault<Usuario>("SELECT * FROM Usuarios WHERE Id = @Id", new { Id = id });
         }
 
         public void Insert(Usuario usuario)
         {
-            var ultimoUsuario = _db.LastOrDefault();
+            string sql = "INSERT INTO Usuarios(Nome, Email, Sexo, RG, CPF, NomeMae, SituacaoCadastro, DataCadastro) VALUES (@Nome, @Email, @Sexo, @RG, @CPF, @NomeMae, @SituacaoCadastro, @DataCadastro); SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
-            if (ultimoUsuario == null)
-            {
-                usuario.Id = 1;
-            }
-            else
-            {
-                usuario.Id = ultimoUsuario.Id;
-                usuario.Id++;
-            }
-            _db.Add(usuario);
+            usuario.Id = _connection.Query<int>(sql, usuario).Single();
         }
 
         public void Update(Usuario usuario)
         {
-            _db.Remove(_db.FirstOrDefault(a => a.Id == usuario.Id));
-            _db.Add(usuario);
+            string sql = "UPDATE Usuarios SET Nome = @Nome, Email = @Email, Sexo = @Sexo, RG = @RG, CPF = @CPF, NomeMae = @NomeMae, SituacaoCadastro = @SituacaoCadastro, DataCadastro = @DataCadastro WHERE Id = @Id";
+
+            _connection.Execute(sql, usuario);
         }
 
         public void Delete(int id)
         {
-            _db.Remove(_db.FirstOrDefault(a => a.Id == id));
+            _connection.Execute("DELETE FROM Usuarios WHERE Id = @Id", new { Id = id });
         }
     }
 }

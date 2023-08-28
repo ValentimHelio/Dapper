@@ -6,7 +6,7 @@ namespace eCommerce.API.IRepositories
     public interface IUsuarioRepository
     {
         public List<Usuario> Get();
-        public Usuario GetById(int id);
+        public Usuario Get(int id);
         public void Insert(Usuario usuario);
         public void Update(Usuario usuario);
         public void Delete(int id);

@@ -38,7 +38,7 @@ namespace eCommerce.API.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var usuario = _repository.GetById(id);
+            var usuario = _repository.Get(id);
 
             if (usuario == null)
             {
