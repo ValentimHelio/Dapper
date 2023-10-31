@@ -1,12 +1,11 @@
-﻿using eCommerce.API.Models;
+﻿using Dapper.Contrib.Extensions;
+using eCommerce.API.IRepositories;
+using eCommerce.API.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Threading.Tasks;
-using Dapper.Contrib.Extensions;
-using eCommerce.API.IRepositories;
 
 namespace eCommerce.API.Repositories
 {
